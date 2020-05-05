@@ -1,0 +1,21 @@
+{
+  "name": "jigsaw",
+  "version": "1.0.0",
+  "description": "Web Dev Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Caleb Jones",
+  "license": "ISC",
+  "dependencies": {
+    "argon2": "^0.26.2",
+    "connect-redis": "^4.0.4",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "multer": "^1.4.2",
+    "redis": "^3.0.2",
+    "sqlite3": "^4.1.1",
+    "uuid": "^7.0.3"
+  }
+}

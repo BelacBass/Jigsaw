@@ -1,0 +1,29 @@
+#place-square{
+    background:rgb(8,107,189);
+    text-align: center;
+    max-width: 8em;
+    border: 1px solid rgb(8,107,189);
+    border-radius: 0.5em;
+} 
+
+body {
+    font-family: "Helvetica", "Trebuchet", sans-serif;
+    font-size: 1em;
+    line-height: 1.5em;
+}
+
+#ball {
+    background-color: rgb(204,0,51); /* AState Scarlet, Pantone 186 */
+    width: 100px;
+    height: 100px;
+    border-radius: 0px;
+    /* border-radius: 10px; */
+    position: absolute;
+    /* Let's start the ball in the middle as well: */
+    /* Note: if `calc` doesn't work, just remove this line */
+    left: calc(50% - 50px); 
+    /* and 1 em unit above the bottom of the window */
+    bottom: 1em; 
+    /* And we want it to always appear "behind" the button */
+    z-index: -1;
+}
