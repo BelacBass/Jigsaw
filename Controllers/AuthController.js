@@ -13,22 +13,18 @@ class AuthController {
 
     async hashPassword (password) {
         const hash = await argon2.hash(password, {
-            type: argon2.argon2id, 
-            memory: 2 ** 16,    
-            hashLength: 32,     
-            timeCost: 3,        
-            parallelism: 1,     
+            type: argon2.argon2id,
+            memoryCost: 2 ** 16, // 64 MB (we're limited on how how this can be due to our hardware)
+            hashLength: 32,      // 32 byte hash (encoded in base64 so it's actually 1/3 longer)
+            timeCost: 3,         // Takes ~220ms on our machines
+            parallelism: 1,      // We have 1 core machines so we can't parallelize any more
         })
         return hash;
     }
 
     async login (username, password) {
-        console.log(`coming from inside login()`);
-        const result = await this.UserModel.getPasswordHash(username)
-            .then( async res => {
-                console.log(`${res}`);
-            });
-        console.log(`The login result is ${result}`);
+        const result = await this.UserModel.getPasswordHash(username);
+        // getPasswordHash() returns undefined if the username does not exist
         if (result === undefined) {
             return false;
         } else {
@@ -42,3 +38,21 @@ class AuthController {
 }
 
 module.exports = AuthController;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

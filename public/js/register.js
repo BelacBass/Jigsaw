@@ -29,19 +29,29 @@ function processForm (event) {
         method: "post",
         body: JSON.stringify(data),
         headers: {"Content-Type": "application/json"}
-    }).then( async res => {
-        if (res.status === 200) {
-            alert('Account Created');
-            //redirect to home for now, change to puzzle when finished
-            location.href = "http://40.122.47.209/";
-        } else if (res.status === 409) {
-            alert('Username exists');
-        } else {
-            window.location = '/error';
-        }
+    }).then( res => {
+        //redirect to home for now, change to puzzle when finished
+        //location.href = "http://40.122.47.209/";
+        return res.json();
+    }).then( data => {
+        console.log(data);
     }).catch( err => {
         console.log(err);
     });
+
+    // }).then( async res => {
+    //     if (res.status === 200) {
+    //         alert('Account Created');
+    //         //redirect to home for now, change to puzzle when finished
+    //         location.href = "http://40.122.47.209/";
+    //     } else if (res.status === 409) {
+    //         alert('Username exists');
+    //     } else {
+    //         window.location = '/error';
+    //     }
+    // }).catch( err => {
+    //     console.log(err);
+    // });
 }
 
 

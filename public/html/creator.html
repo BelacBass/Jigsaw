@@ -1,0 +1,57 @@
+<html>
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta http-equiv="X-UA-Compatiable" content="ie=edge">
+      <title>Sliding Puzzle</title>
+      <link type="text/css" href="../css/creator.css">  
+    </head>
+    <body>
+      <section id='puzzle-form-area'>
+        <form name='puzzle-form' id='puzzle-form' method='POST'>
+                <label for='puzzle-size'>
+                        Select Size
+                </label>
+                <select name='puzzle-size' id='puzzle-size'>
+                        <option value='3'>3</option>
+                        <option value='4'>4</option>
+                        <option value='5' selected>5</option>
+                        <option value='6'>6</option>
+                        <option value='7'>7</option>
+                        <option value='8'>8</option>
+                        <option value='9'>9</option>
+                        <option value='10'>10</option>
+                </select>
+  
+                <label for='puzzle-size'>
+                  Upload Picture
+                </label>
+                <input type="file" id="input" name="input" accept="image/png, image/jpeg">
+  
+                <input type="submit" name='puzzle-size-submit' id='puzzle-size-submit' value='Test'>
+  
+        </form>
+      </section>
+        <canvas id="canvas"></canvas>
+
+        <script  src="../js/creator.js"></script>  
+
+        <button type='button' onclick="randomize()">Randomize</button>
+
+      <section id='save-form-area'>
+          <form action="/upload" name='save-form' id='save-form' method='POST' enctype="multipart/form-data">
+            <label for='puzzle-name'>
+                Puzzle Name
+             </label>
+             <input type="text" name='puzzle-name' id='puzzle-name' maxlength="280">
+             <input name="puzzleImg" type="file">
+             <input type='submit' name='save-button' id="saveButton" value='Save'>
+          </form>
+      </section>
+         
+         
+    </body>
+  </html>
+  
+  
+  

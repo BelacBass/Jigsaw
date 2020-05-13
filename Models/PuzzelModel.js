@@ -1,23 +1,29 @@
+
+const uuidV4 = require('uuid').v4;
+
+
 class PuzzelModel {
     constructor (DAO) {
         this.DAO = DAO
     }
   
+        //think about an id
     createTable () {
         const sql = `
             CREATE TABLE IF NOT EXISTS Puzzels (
-            title TEXT PRIMARY KEY,
+            uuid TEXT PRIMARY KEY,
+            title,
             size INTEGER,
-            rating INTEGER,
-            picturefile TEXT,
+            imgFileName TEXT,
             creator TEXT
-        )`
-        return this.DAO.run(sql)
+        )`;
+        return this.DAO.run(sql);
     }
 
-    async addPuzzle (title, size, rating, pictureFile, creator) {
-        const sql = `INSERT INTO Puzzels (title, size, rating, pictureFile, creator) VALUES (?, ?, ?, ?, ?)`;
-        await this.DAO.run(sql, [title, size, rating, pictureFile, creator]);
+    async addPuzzle (title, size, imgFileName) {
+        const sql = `INSERT INTO Puzzels (uuid, title, size, imgFileName) VALUES (?, ?, ?, ?)`;
+        const uuid = uuidV4();
+        await this.DAO.run(sql, [uuid, title, size, imgFileName]);
     }
 
     async getCreator (title) {

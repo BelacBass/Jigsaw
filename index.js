@@ -8,10 +8,35 @@ const ScoreModel            = require('./Models/ScoreModel');
 const BadgeModel            = require('./Models/BadgeModel');
 const BadgesEarnedModel     = require('./Models/BadgesEarnedModel');
 const AuthController        = require('./Controllers/AuthController');
-const UserController        = require('./Controllers/UserController');
+const UploadController       = require('./Controllers/UploadController');
+//const UserController        = require('./Controllers/UserController');
 const redis                 = require('redis');
 const session               = require('express-session');
 const RedisStore            = require('connect-redis')(session);
+const multer                = require('multer');
+const bodyParser            = require('body-parser');
+
+
+
+app.use(bodyParser.urlencoded({extended: true}));
+
+
+/*
+    uploading a picture
+*/
+const storage = multer.diskStorage({
+    destination: (req, file, callback) => {
+        callback(null, './public/images');
+    },
+    filename: (req, file, callback) => {
+        const ext = file.mimetype.split('/')[1];
+        callback(null, `${file.fieldname}-${Data.now()}.${ext}`);
+    }
+});
+
+var upload = multer ({ storage: storage }).single('puzzleImg');
+
+
 
 
 /*
@@ -28,7 +53,7 @@ const sess = session({
     }),
     secret:'needs to be random string',
     resave: false,
-    cooki: {
+    cookie: {
         httpOnly: true,
     },
     saveUninitialized: false,
@@ -67,32 +92,25 @@ app.get("/jigsaw", (req, res) => {
 /*
     Registration
 */
-app.get("/register", errorHandler(async (req, res) => {
-    //console.log(`in the register get`);
+app.get("/register", async (req, res) => {
     res.sendFile(path.join(__dirname, "public", "html", "register.html"));
-}));
+});
 
-app.post("/register", errorHandler(async (req, res) => {
+app.post("/register", async (req, res) => {
     const body = req.body;
+    console.log(body);
     if (body === undefined || (!body.username || !body.password)) {
         return res.sendStatus(400);
     }
     const {username, password} = body;
     try {
         await Auth.register(username, password);
-        // console.log(`status 200`);
         res.sendStatus(200);
     } catch (err) {
-        if (err.code === 'SQLITE_CONSTRAINT') {
-            //console.log(`problem in the catch`);
-            console.error(err);
-            logger.error(err);
-            res.sendStatus(409); // conflict
-        } else {
-            throw err;
-        }
+        console.error(err);
+        res.sendStatus(500);
     }
- }));
+});
 
 
 /*
@@ -100,6 +118,7 @@ app.post("/register", errorHandler(async (req, res) => {
 */
 app.get("/login", errorHandler(async (req, res) => {
     if (req.session.isVerified) {
+        console.log("already logged in");
         res.redirect("/puzzle")
     } else {
         res.sendFile(path.join(__dirname, "public", "html", "login.html"));
@@ -116,9 +135,10 @@ app.post("/login", errorHandler( async (req, res) => {
     req.session.isVerified = isVerified;
     if(isVerified) {
         req.session.username = username;
-        req.session.uuid = await UserController.getUserId(username);
+        req.session.uuid = await Users.getUserID(username);
     }
     res.sendStatus(status);
+    
 }));
 
 
@@ -129,7 +149,45 @@ app.get("/puzzle", errorHandler(async (req, res) => {
     res.sendFile(path.join(__dirname, "public", "html", "puzzle.html"));
 }));
 
+ 
 
+/*
+    Creator
+*/
+app.get("/creator", errorHandler(async (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "html", "creator.html"));
+}));
+
+app.post("/upload", errorHandler(async (req, res) => {
+    if(req.body === undefined) {
+        return res.status(400);
+    }
+
+    upload(req, res, (err) =>  {
+        if(err) {
+            console.warn("error while uploading");
+        } else {
+            console.log(req.file);
+        } 
+
+        console.log("photo uploaded");
+    })
+    
+
+    const name = req.body.puzzleName;
+    const imgFileName = req.body.puzzleImg;
+    const size = req.body.puzzleSize;
+    console.log(`name: ${name}, imgFileName: ${imgFileName}, size: ${size}`);
+    
+    // try {
+    //     await Puzzles.addPuzzle(name, size, imgFileName);
+    //     res.sendStatus(200);
+    // } catch (err) {
+    //     console.log(err);
+    //     res.sendStatus(500);
+    // }
+
+}));
 
 
 
@@ -145,6 +203,8 @@ async function initDB () {
     const dao = await createDAO(dbFilePath);
     Users = new UserModel(dao);
     await Users.createTable();
+    Puzzles = new PuzzelModel(dao);
+    await Puzzles.createTable();
     Auth = new AuthController(dao);
 }
 
@@ -152,11 +212,11 @@ async function initDB () {
 /*
     Error Handling
 */
-app.use(function (err, req, res, next) {
-    console.error(err.stack);
-    logger.error(err);
-    res.redirect('/error');
-});
+// app.use(function (err, req, res, next) {
+//     console.error(err.stack);
+//     logger.error(err);
+//     res.redirect('/error');
+// });
 
 function errorHandler (fn) {
     return function (req, res, next) {
